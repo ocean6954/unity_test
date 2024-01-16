@@ -1,11 +1,11 @@
 using Leap;
 using Leap.Unity;
-using LeapInternal;
 using UnityEngine;
 
 public class trackingData : MonoBehaviour
 {
     public LeapProvider leapProvider;
+    public Transform handTransform; // 手のTransform
 
     private void OnEnable()
     {
@@ -22,39 +22,16 @@ public class trackingData : MonoBehaviour
         //to find the first hand that matches the Chirality
         foreach (var hand in frame.Hands)
         {
-            if (hand.IsLeft)
-            {
-                Debug.Log("左手");
+            // メインカメラの位置を取得
+            Vector3 newPosition = Camera.main.transform.position;
 
-                // Assuming LEAP_VECTOR structure
-                LEAP_VECTOR leftHandPosition = new LEAP_VECTOR
-                {
-                    x = hand.PalmPosition.x,
-                    y = hand.PalmPosition.y,
-                    z = hand.PalmPosition.z
-                };
+            // 新しい回転を設定（例: 元の回転をそのまま使用）
+            Quaternion newRotation = hand.Rotation;
+            handTransform.position = newPosition;
+            handTransform.rotation = newRotation;
+            Debug.Log("手の位置 " + hand.PalmPosition + "\nカメラの位置: " + Camera.main.transform.position);
 
-                // Now you can use leftHandPosition to access x, y, z coordinates.
-                Debug.Log("Left Hand Position: " + leftHandPosition.x + ", " + leftHandPosition.y + ", " + leftHandPosition.z);
-            }
-            if (hand.IsRight)
-            {
-                Debug.Log("右手");
-
-                // Assuming LEAP_VECTOR structure
-                LEAP_VECTOR rightHandPosition = new LEAP_VECTOR
-                {
-                    x = hand.PalmPosition.x,
-                    y = hand.PalmPosition.y,
-                    z = hand.PalmPosition.z
-                };
-
-                // Now you can use rightHandPosition to access x, y, z coordinates.
-                Debug.Log("Right Hand Position: " + rightHandPosition.x + ", " + rightHandPosition.y + ", " + rightHandPosition.z);
-            }
         }
-
-        //Use a helpful utility function to get the first hand that matches the Chirality
         Hand _leftHand = frame.GetHand(Chirality.Left);
         Hand _rightHand = frame.GetHand(Chirality.Right);
     }
